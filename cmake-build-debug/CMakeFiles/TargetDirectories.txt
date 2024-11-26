@@ -1,0 +1,3 @@
+C:/Users/Bartek/Desktop/ProjektSO/cmake-build-debug/CMakeFiles/ProjektSO.dir
+C:/Users/Bartek/Desktop/ProjektSO/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Bartek/Desktop/ProjektSO/cmake-build-debug/CMakeFiles/rebuild_cache.dir
