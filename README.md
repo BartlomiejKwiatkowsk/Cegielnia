@@ -1,0 +1,2 @@
+# Cegielnia
+Symulacja działania cegielni
