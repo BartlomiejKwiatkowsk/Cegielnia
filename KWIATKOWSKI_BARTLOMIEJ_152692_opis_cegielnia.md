@@ -21,34 +21,6 @@ Ciężarówki kończą pracę po rozwiezieniu wszystkich wyprodukowanych cegieł
 
 Napisanie programów symulujących działanie dyspozytora, pracowników oraz ciężarówek w cegielni zgodnie z powyższym opisem.
 
-## Opis Testów
-
-### Test 1: Podstawowe działanie systemu
-**Cel:** Sprawdzenie poprawności załadunku cegieł na taśmę i ciężarówki.  
-**Warunki początkowe:**
-- `C` = 10 jednostek,
-- `K` = 5 cegieł,
-- `M` = 15 jednostek masy,
-- `N` = 3 ciężarówki,
-- `Ti` = 2 sekundy.  
-  **Oczekiwany wynik:** Wszystkie cegły zostają załadowane zgodnie z kolejnością, bez przekroczenia limitów `K` i `M`.
-
-### Test 2: Przekroczenie udźwigu taśmy
-**Cel:** Weryfikacja reakcji systemu na przekroczenie masy `M`.  
-**Warunki początkowe:**
-- `C` = 10, `K` = 5, `M` = 5.  
-  **Oczekiwany wynik:** System odrzuca cegły przekraczające masę `M` i wyświetla komunikat ostrzegawczy.
-
-### Test 3: Sygnał 1 - Odjazd z niepełnym ładunkiem
-**Cel:** Weryfikacja odjazdu ciężarówki na polecenie dyspozytora.  
-**Warunki początkowe:** Generowanie sygnału 1 podczas ładowania.  
-**Oczekiwany wynik:** Ciężarówka odjeżdża z aktualnym ładunkiem.
-
-### Test 4: Sygnał 2 - Zakończenie pracy
-**Cel:** Weryfikacja zakończenia pracy przez pracowników.  
-**Warunki początkowe:** Sygnał 2 po określonym czasie.  
-**Oczekiwany wynik:** Pracownicy kończą pracę, a system kończy symulację.
-
 ## Repozytorium GitHub
 
 [Link do repozytorium](https://github.com/twojanazwa/repozytorium_cegielnia)  
