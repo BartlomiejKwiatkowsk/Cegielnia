@@ -1,0 +1,8 @@
+//
+// Created by Bartek on 14.01.2025.
+//
+
+#ifndef PROJEKTSO_DYSPOZYTOR_H
+#define PROJEKTSO_DYSPOZYTOR_H
+
+#endif //PROJEKTSO_DYSPOZYTOR_H

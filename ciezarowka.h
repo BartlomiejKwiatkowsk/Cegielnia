@@ -1,0 +1,8 @@
+//
+// Created by Bartek on 14.01.2025.
+//
+
+#ifndef PROJEKTSO_CIEZAROWKA_H
+#define PROJEKTSO_CIEZAROWKA_H
+
+#endif //PROJEKTSO_CIEZAROWKA_H
