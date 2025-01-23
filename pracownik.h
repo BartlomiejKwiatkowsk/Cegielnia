@@ -1,13 +1,8 @@
-
 #ifndef PROJEKTSO_PRACOWNIK_H
 #define PROJEKTSO_PRACOWNIK_H
+#include <iostream>
+#include "utils.h"
 
-class Pracownik {
-public:
-    Pracownik(int id, int masaCegly);
-    void pracuj();
-private:
-    int id;
-    int masaCegly;
-};
+void pracownik(int id);
+
 #endif //PROJEKTSO_PRACOWNIK_H

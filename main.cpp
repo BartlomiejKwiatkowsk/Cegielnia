@@ -1,30 +1,105 @@
 #include <iostream>
+#include <sys/wait.h>
+#include <unistd.h>
+#include <vector>
+#include <signal.h>
 #include "pracownik.h"
 #include "ciezarowka.h"
 #include "dyspozytor.h"
 #include "utils.h"
 
-int main() {
-    int ladownoscCiezarowki = 10;
-    Ciezarowka ciezarowka(ladownoscCiezarowki);
-    Dyspozytor dyspozytor;
-    Pracownik pracownik1(1, 1);
-    Pracownik pracownik2(2, 2);
-    Pracownik pracownik3(3, 3);
+using namespace std;
 
+// Lista identyfikatorów procesów dzieci
+vector<pid_t> child_pids;
 
-    pracownik1.pracuj();
-    pracownik2.pracuj();
-    pracownik3.pracuj();
+// Funkcja czyszcząca zasoby i kończąca wszystkie procesy potomne
+void cleanup(int signum) {
+    cout << "\nPrzerwanie sygnałem " << signum << ". Czyszczenie zasobów..." << endl;
 
-    ciezarowka.zaladuj(5);// Testowa ładowność
-    if (ciezarowka.jestPelna()) {
-        ciezarowka.odjedz();
-    } else {
-        dyspozytor.wyslijSygnal1();
+    // Zabijanie wszystkich procesów potomnych
+    for (pid_t pid : child_pids) {
+        kill(pid, SIGTERM);
     }
 
-    dyspozytor.wyslijSygnal2();
+    // Oczekiwanie na zakończenie procesów potomnych
+    for (pid_t pid : child_pids) {
+        waitpid(pid, nullptr, 0);
+    }
+
+    // Czyszczenie pamięci dzielonej i semaforów
+    cleanupSharedResources();
+
+    exit(0);
+}
+
+int main() {
+    // Ustawianie obsługi sygnałów (tylko dla procesu rodzica)
+    struct sigaction sa;
+    sa.sa_handler = cleanup;
+    sigemptyset(&sa.sa_mask);
+    sa.sa_flags = 0;
+
+    if (sigaction(SIGINT, &sa, nullptr) == -1) {
+        perror("sigaction");
+        return 1;
+    }
+
+    // Inicjalizacja pamięci dzielonej i semaforów
+    if (!initSharedResources()) {
+        cerr << "Nie udało się zainicjalizować zasobów współdzielonych." << endl;
+        return 1;
+    }
+
+    // Uruchamianie procesów pracowników
+    for (int i = 1; i <= 3; ++i) {
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("fork - pracownik");
+            cleanup(SIGINT);
+        }
+        if (pid == 0) {
+            pracownik(i);
+            exit(0);
+        }
+        child_pids.push_back(pid);
+    }
+
+    // Uruchamianie procesów ciężarówek
+    for (int i = 1; i <= N; ++i) {
+        pid_t pid = fork();
+        if (pid < 0) {
+            perror("fork - ciężarówka");
+            cleanup(SIGINT);
+        }
+        if (pid == 0) {
+            ciezarowki(i);
+            exit(0);
+        }
+        child_pids.push_back(pid);
+    }
+
+    // Uruchamianie procesu dyspozytora
+    pid_t pidDispatcher = fork();
+    if (pidDispatcher < 0) {
+        perror("fork - dyspozytor");
+        cleanup(SIGINT);
+    }
+    if (pidDispatcher == 0) {
+        dyspozytor();
+        exit(0);
+    }
+    child_pids.push_back(pidDispatcher);
+
+    // Czekanie na zakończenie wszystkich procesów potomnych
+    for (pid_t pid : child_pids) {
+        waitpid(pid, nullptr, 0);
+    }
+
+    // Czyszczenie pamięci dzielonej i semaforów
+    cleanupSharedResources();
+
+    cout << "Program zakończony pomyślnie." << endl;
 
     return 0;
 }

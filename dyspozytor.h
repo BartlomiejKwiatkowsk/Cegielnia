@@ -1,11 +1,9 @@
 #ifndef PROJEKTSO_DYSPOZYTOR_H
 #define PROJEKTSO_DYSPOZYTOR_H
 
-class Dyspozytor {
-public:
-    Dyspozytor();
-    void wyslijSygnal1();
-    void wyslijSygnal2();
-};
+#include <iostream>
+#include "utils.h"
+
+void dyspozytor();
 
 #endif //PROJEKTSO_DYSPOZYTOR_H
