@@ -16,24 +16,28 @@ vector<pid_t> child_pids;
 // Funkcja czyszcząca zasoby i kończąca wszystkie procesy potomne
 void cleanup(int signum) {
     cout << "\nPrzerwanie sygnałem " << signum << ". Czyszczenie zasobów..." << endl;
-
     // Zabijanie wszystkich procesów potomnych
     for (pid_t pid : child_pids) {
         kill(pid, SIGTERM);
     }
-
     // Oczekiwanie na zakończenie procesów potomnych
     for (pid_t pid : child_pids) {
         waitpid(pid, nullptr, 0);
     }
-
     // Czyszczenie pamięci dzielonej i semaforów
     cleanupSharedResources();
-
     exit(0);
 }
 
 int main() {
+    // Ustawienie flagi głównego procesu
+    isMainProcess = true;
+
+    // Tworzenie plików dla ftok, jeśli nie istnieją
+    // Jest to konieczne, ponieważ ftok wymaga istniejących plików
+    system("touch ceglarnia_shm");
+    system("touch ceglarnia_sem");
+
     // Ustawianie obsługi sygnałów (tylko dla procesu rodzica)
     struct sigaction sa;
     sa.sa_handler = cleanup;
@@ -41,7 +45,15 @@ int main() {
     sa.sa_flags = 0;
 
     if (sigaction(SIGINT, &sa, nullptr) == -1) {
-        perror("sigaction");
+        perror("sigaction - SIGINT");
+        return 1;
+    }
+    if (sigaction(SIGTERM, &sa, nullptr) == -1) {
+        perror("sigaction - SIGTERM");
+        return 1;
+    }
+    if (sigaction(SIGTSTP, &sa, nullptr) == -1) { // Obsługa Ctrl+Z
+        perror("sigaction - SIGTSTP");
         return 1;
     }
 
@@ -59,6 +71,8 @@ int main() {
             cleanup(SIGINT);
         }
         if (pid == 0) {
+            // Proces pracownika
+            isMainProcess = false;
             pracownik(i);
             exit(0);
         }
@@ -73,6 +87,8 @@ int main() {
             cleanup(SIGINT);
         }
         if (pid == 0) {
+            // Proces ciężarówki
+            isMainProcess = false;
             ciezarowki(i);
             exit(0);
         }
@@ -86,6 +102,8 @@ int main() {
         cleanup(SIGINT);
     }
     if (pidDispatcher == 0) {
+        // Proces dyspozytora
+        isMainProcess = false;
         dyspozytor();
         exit(0);
     }
@@ -100,6 +118,5 @@ int main() {
     cleanupSharedResources();
 
     cout << "Program zakończony pomyślnie." << endl;
-
     return 0;
 }

@@ -9,6 +9,7 @@ using namespace std;
 // Prototypy funkcji
 extern void signalTruckDeparture(int truck_id);
 extern void signalEndOfWork();
+extern bool isMainProcess;
 
 void dyspozytor() {
     while (true) {
@@ -16,7 +17,6 @@ void dyspozytor() {
         cout << "1: Wypuść ciężarówkę z niepełnym ładunkiem\n";
         cout << "2: Zakończ pracę\n";
         cout << "Wybór: ";
-
         char command;
         cin >> command;
 
@@ -25,10 +25,10 @@ void dyspozytor() {
             cout << "Dyspozytor: Podaj numer ciężarówki (1-" << N << "): ";
             int truck_id;
             cin >> truck_id;
-
             if(truck_id >= 1 && truck_id <= N){
                 signalTruckDeparture(truck_id);
-            } else {
+            }
+            else{
                 cout << "Dyspozytor: Nieprawidłowy numer ciężarówki." << endl;
             }
         }
@@ -37,8 +37,13 @@ void dyspozytor() {
             signalEndOfWork();
             break;
         }
-        else {
+        else{
             cout << "Dyspozytor: Nieznana komenda. Spróbuj ponownie." << endl;
         }
     }
+
+    // Po zakończeniu pracy, odłączanie się od pamięci dzielonej
+    cleanupSharedResources();
+    cout << "Dyspozytor: Kończę pracę." << endl;
+    exit(0);
 }

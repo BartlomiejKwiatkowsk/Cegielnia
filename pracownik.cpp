@@ -7,8 +7,9 @@
 using namespace std;
 
 extern SharedData* sharedData;
+extern int semID;
+extern bool isMainProcess;
 
-// Zmienna i funkcja zdefiniowane jako static
 static volatile sig_atomic_t terminateFlag = 0;
 
 // Obsługa sygnałów dla pracowników
@@ -19,12 +20,11 @@ static void handle_signal(int signum) {
 void pracownik(int id) {
     int masa = id; // P1 = 1, P2 = 2, P3 = 3 jednostki masy
 
-    // Ignorowanie SIGINT w dzieciach za pomocą sigaction
+    // Ignorowanie SIGINT w procesach potomnych
     struct sigaction sa_ignore;
     sa_ignore.sa_handler = SIG_IGN;
     sigemptyset(&sa_ignore.sa_mask);
     sa_ignore.sa_flags = 0;
-
     if (sigaction(SIGINT, &sa_ignore, nullptr) == -1) {
         perror("sigaction - ignore SIGINT");
         exit(1);
@@ -35,13 +35,12 @@ void pracownik(int id) {
     sa.sa_handler = handle_signal;
     sigemptyset(&sa.sa_mask);
     sa.sa_flags = 0;
-
     if (sigaction(SIGTERM, &sa, nullptr) == -1) {
         perror("sigaction - pracownik");
         exit(1);
     }
 
-    while (!terminateFlag) {
+    while (!terminateFlag && !sharedData->endOfWork) {
         sleep(1); // Symulacja pracy
 
         if (sharedData->endOfWork) {
@@ -51,11 +50,15 @@ void pracownik(int id) {
         if (!addBrickToBelt(masa)) {
             cout << "Pracownik " << id << ": Taśma pełna, czekam..." << endl;
         } else {
-            cout << "Pracownik " << id << ": Dodałem cegłę o masie " << masa
-                 << ". Masa taśmy: " << sharedData->masaAktualna
+            cout << "Pracownik " << id << ": Dodałem cegłę o masie "
+                 << masa << ". Masa taśmy: " << sharedData->masaAktualna
                  << ", Ilość cegieł: " << sharedData->iloscCegiel << endl;
         }
     }
 
     cout << "Pracownik " << id << ": Kończę pracę." << endl;
+
+    // Odłączenie się od pamięci dzielonej bez usuwania zasobów
+    cleanupSharedResources();
+    exit(0);
 }

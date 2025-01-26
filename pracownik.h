@@ -1,5 +1,6 @@
 #ifndef PROJEKTSO_PRACOWNIK_H
 #define PROJEKTSO_PRACOWNIK_H
+
 #include <iostream>
 #include "utils.h"
 
