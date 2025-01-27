@@ -61,7 +61,6 @@ bool initSharedResources() {
         perror("shmget");
         return false;
     }
-
     sharedData = (SharedData*)shmat(shmID, nullptr, 0);
     if (sharedData == (void*)-1) {
         perror("shmat");
