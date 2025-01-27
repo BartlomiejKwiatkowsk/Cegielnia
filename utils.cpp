@@ -67,7 +67,7 @@ bool initSharedResources() {
         return false;
     }
 
-    // Inicjalizacja danych współdzielonych, tylko jeśli jest to główny proces
+
     if (isMainProcess) {
         sharedData->masaAktualna = 0;
         sharedData->iloscCegiel = 0;
