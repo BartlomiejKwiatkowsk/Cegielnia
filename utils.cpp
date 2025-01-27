@@ -140,6 +140,7 @@ bool addBrickToBelt(int masa) {
     }
 
     bool success = false;
+    // Sprawdzamy limity liczby i masy cegieł
     if (sharedData->iloscCegiel < K && sharedData->masaAktualna + masa <= M) {
         sharedData->iloscCegiel++;
         sharedData->masaAktualna += masa;
